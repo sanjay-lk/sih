@@ -1,0 +1,29 @@
+{
+  "name": "mobile-app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start -c",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "dependencies": {
+    "expo": "~51.0.18",
+    "expo-location": "~17.0.1",
+    "expo-sensors": "~13.0.1",
+    "expo-device": "~6.0.2",
+    "expo-notifications": "~0.28.14",
+    "react": "18.2.0",
+    "react-native": "0.74.3",
+    "axios": "^1.7.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.5.4"
+  }
+}
+
+
+
