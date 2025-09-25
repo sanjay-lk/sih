@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: sih-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-smartindia2024}
+      MONGO_INITDB_DATABASE: accidents
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - sih-network
+
+  # Backend API
+  backend-api:
+    build:
+      context: ./backend-api
+      dockerfile: Dockerfile
+    container_name: sih-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4001
+      MONGO_URI: mongodb://admin:${MONGO_ROOT_PASSWORD:-smartindia2024}@mongodb:27017/accidents?authSource=admin
+      MAPBOX_TOKEN: ${MAPBOX_TOKEN}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER}
+      FIREBASE_SERVER_KEY: ${FIREBASE_SERVER_KEY}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+    ports:
+      - "4001:4001"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend-api/logs:/app/logs
+    networks:
+      - sih-network
+
+  # Hospital Dashboard
+  hospital-dashboard:
+    build:
+      context: ./hospital-dashboard
+      dockerfile: Dockerfile
+    container_name: sih-hospital-dashboard
+    restart: unless-stopped
+    environment:
+      VITE_BACKEND_URL: http://localhost:4001
+      VITE_MAPBOX_TOKEN: ${MAPBOX_TOKEN}
+    ports:
+      - "5177:80"
+    depends_on:
+      - backend-api
+    networks:
+      - sih-network
+
+  # Driver Dashboard
+  driver-dashboard:
+    build:
+      context: ./driver-dashboard
+      dockerfile: Dockerfile
+    container_name: sih-driver-dashboard
+    restart: unless-stopped
+    environment:
+      VITE_BACKEND_URL: http://localhost:4001
+    ports:
+      - "5180:80"
+    depends_on:
+      - backend-api
+    networks:
+      - sih-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sih-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend-api
+      - hospital-dashboard
+      - driver-dashboard
+    networks:
+      - sih-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  sih-network:
+    driver: bridge

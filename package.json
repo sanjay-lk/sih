@@ -1,0 +1,24 @@
+{
+  "name": "smartindia",
+  "version": "1.0.0",
+  "description": "A comprehensive Smart India Hackathon project that provides real-time accident detection and automated emergency response system.",
+  "main": "test-system.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanjay-lk/sih.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sanjay-lk/sih/issues"
+  },
+  "homepage": "https://github.com/sanjay-lk/sih#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "socket.io-client": "^4.8.1"
+  }
+}
